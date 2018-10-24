@@ -197,7 +197,7 @@ sudo mkdir -p $MOUNTDIR/boot/efi
 ARCH=${ARCH-i386}
 TARGET=i386-pc
 echo -e ">>> Running grub install for target $TARGET"
-sudo grub-install --target=$TARGET --force --boot-directory $MOUNTDIR/boot/ $LOOP
+sudo grub-install --target=$TARGET --directory=/home/arnaud/Téléchargements/tmp/usr/lib/grub/i386-pc --force --boot-directory $MOUNTDIR/boot/ $LOOP
 
 echo -e ">>> Synchronize file cache"
 sync

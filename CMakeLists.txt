@@ -17,7 +17,7 @@ set(CMAKE_C_COMPILER_TARGET ${TRIPLE})
 
 message(STATUS "Target triple ${TRIPLE}")
 
-option(WITH_SOLO5 "Install with solo5 support" ON)
+option(WITH_SOLO5 "Install with solo5 support" OFF)
 
 set(CMAKE_TOOLCHAIN_FILE ${INCLUDEOS_ROOT}/cmake/elf-toolchain.cmake)
 
