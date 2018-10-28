@@ -20,6 +20,12 @@
 [submodule "examples/SQlite/libsl3"]
 	path = examples/SQlite/libsl3
 	url = https://github.com/fwsGonzo/libsl3.git
+[submodule "examples/prez-db/sqlite3_amalgamation"]
+        path = examples/prez-db/sqlite3_amalgamation
+        url = https://github.com/fwsGonzo/sqlite3_amalgamation.git
+[submodule "examples/prez-db/libsl3"]
+        path = examples/prez-db/libsl3
+        url = https://github.com/fwsGonzo/libsl3.git
 [submodule "lib/protobuf"]
 	path = lib/protobuf
 	url = https://github.com/google/protobuf.git
