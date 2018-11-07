@@ -25,7 +25,30 @@ HTML_RESPONSE()
 
   // Generate some HTML
   std::stringstream stream;
-  stream
+
+  stream << "[";
+
+  Dataset ds = db.select(
+      "SELECT title, points, author, timeToRead, comments FROM posts;");
+  bool comma = false;
+  for (auto &row : ds) {
+    if (comma)
+      stream << ",";
+    else
+      comma = true;
+
+    stream << "{"
+           << "     \"title\": \"" << row[0] << "\","
+           << "     \"points\": " << row[1] << ","
+           << "     \"author\": \"" << row[2] << "\","
+           << "     \"timeToRead\": " << row[3] << ","
+           << "     \"comments\": " << row[4] << ""
+           << " }";
+  }
+
+  stream << "]";
+
+  /*stream
       << "<!DOCTYPE html><html><head>"
       << "<link href='https://fonts.googleapis.com/css?family=Ubuntu:500,300'"
       << " rel='stylesheet' type='text/css'>"
@@ -33,9 +56,9 @@ HTML_RESPONSE()
          "Include OS on GCP</title></head><body>"
       << "<h1 style='color: #" << std::hex << ((color >> 8) | 0x020202)
       << "; font-family: \"Arial\", sans-serif'>Table read from SQLite, "
-         "everything in Ring O</h1>";
+         "everything in Ring O</h1>";*/
 
-  Dataset ds = db.select("SELECT f1, f2  FROM tbl;");
+  /*Dataset ds = db.select("SELECT f1, f2  FROM tbl;");
   stream << "<table>";
   for (auto &row : ds) {
     stream << "<tr>";
@@ -46,9 +69,7 @@ HTML_RESPONSE()
   }
   stream << "</table>";
 
-
-  stream
-      << "<footer><hr/>Capitole du Libre 2018</footer></body></html>";
+  stream << "<footer><hr/>Capitole du Libre 2018</footer></body></html>";*/
 
   return stream.str();
 }
@@ -65,23 +86,27 @@ handle_request(const http::Request &req)
   header.set_field(http::header::Server, "IncludeOS/0.10");
 
   // GET /
-  if (req.method() == http::GET && req.uri().to_string() == "/") {
-    // add HTML response
+  if (req.method() == http::GET && req.uri().to_string() == "/api/posts") {
     res.add_body(HTML_RESPONSE());
 
-    // set Content type and length
-    header.set_field(http::header::Content_Type, "text/html; charset=UTF-8");
+    header.set_field(http::header::Content_Type,
+                     "application/json; charset=UTF-8");
     header.set_field(http::header::Content_Length,
                      std::to_string(res.body().size()));
   } else {
-    // Generate 404 response
     res.set_status_code(http::Not_Found);
   }
 
   header.set_field(http::header::Connection, "close");
 
-  auto cmd = db.prepare("INSERT INTO tbl (f1, f2) VALUES (?,?);");
-  cmd.execute(parameters(nextId++, "another ?"));
+  auto cmd = db.prepare("INSERT INTO posts (id, title, points, author, "
+                        "timeToRead, comments) VALUES (?,?,?,?,?,?);");
+  cmd.execute(parameters(nextId++,
+                         "Super Title",
+                         rand() % 42,
+                         "Mysterious Nobox",
+                         rand() % 132,
+                         rand() % 2000));
 
   return res;
 }
@@ -89,30 +114,31 @@ handle_request(const http::Request &req)
 void
 Service::start()
 {
-  // using namespace sl3;
-  // run commands against the db
-  db.execute("CREATE TABLE tbl(f1 INTEGER, f2 TEXT);");
+  db.execute("CREATE TABLE posts(id INTEGER, title TEXT, points INTEGER, "
+             "author TEXT, timeToRead INTEGER, comments INTEGER);");
 
-  auto cmd = db.prepare("INSERT INTO tbl (f1, f2) VALUES (?,?);");
-  cmd.execute(parameters(nextId++, "one"));
-  cmd.execute(parameters(nextId++, "two"));
+  auto cmd = db.prepare("INSERT INTO posts (id, title, points, author, "
+                        "timeToRead, comments) VALUES (?,?,?,?,?,?);");
+  cmd.execute(
+      parameters(nextId++, "Super Title", 42, "Mysterious Nobox", 63, 2));
 
-  // access the data
-  Dataset ds = db.select("SELECT * FROM tbl;");
+  /*
+    // access the data
+    Dataset ds = db.select("SELECT * FROM tbl;");
 
-  // Dataset row is a container
-  auto row = ds[0];
-  assert(row.size() == 2);
-  assert(row[0].type() == Type::Int);
-  assert(row[1].type() == Type::Text);
+    // Dataset row is a container
+    auto row = ds[0];
+    assert(row.size() == 2);
+    assert(row[0].type() == Type::Int);
+    assert(row[1].type() == Type::Text);
 
-  // of course there is also iterator access
-  for (auto &row : ds) {
-    for (auto &field : row) {
-      std::cout << field << " ";
-    }
-    std::cout << std::endl;
-  }
+    // of course there is also iterator access
+    for (auto &row : ds) {
+      for (auto &field : row) {
+        std::cout << field << " ";
+      }
+      std::cout << std::endl;
+    }*/
 
   /**
    * REST server start
@@ -132,6 +158,7 @@ Service::start()
   server.on_connect([](net::tcp::Connection_ptr conn) {
     printf("<Service> @on_connect: Connection %s successfully established.\n",
            conn->remote().to_string().c_str());
+
     // read async with a buffer size of 1024 bytes
     // define what to do when data is read
     conn->on_read(1024, [conn](auto buf) {
