@@ -48,29 +48,6 @@ HTML_RESPONSE()
 
   stream << "]";
 
-  /*stream
-      << "<!DOCTYPE html><html><head>"
-      << "<link href='https://fonts.googleapis.com/css?family=Ubuntu:500,300'"
-      << " rel='stylesheet' type='text/css'>"
-      << "<title>Unikernel demo : SQLite with a little REST service inside "
-         "Include OS on GCP</title></head><body>"
-      << "<h1 style='color: #" << std::hex << ((color >> 8) | 0x020202)
-      << "; font-family: \"Arial\", sans-serif'>Table read from SQLite, "
-         "everything in Ring O</h1>";*/
-
-  /*Dataset ds = db.select("SELECT f1, f2  FROM tbl;");
-  stream << "<table>";
-  for (auto &row : ds) {
-    stream << "<tr>";
-    for (auto &field : row) {
-      stream << "<td>" << field << "</td>";
-    }
-    stream << "</tr>";
-  }
-  stream << "</table>";
-
-  stream << "<footer><hr/>Capitole du Libre 2018</footer></body></html>";*/
-
   return stream.str();
 }
 
@@ -85,7 +62,6 @@ handle_request(const http::Request &req)
 
   header.set_field(http::header::Server, "IncludeOS/0.10");
 
-  // GET /
   if (req.method() == http::GET && req.uri().to_string() == "/api/posts") {
     res.add_body(HTML_RESPONSE());
 
@@ -121,24 +97,6 @@ Service::start()
                         "timeToRead, comments) VALUES (?,?,?,?,?,?);");
   cmd.execute(
       parameters(nextId++, "Super Title", 42, "Mysterious Nobox", 63, 2));
-
-  /*
-    // access the data
-    Dataset ds = db.select("SELECT * FROM tbl;");
-
-    // Dataset row is a container
-    auto row = ds[0];
-    assert(row.size() == 2);
-    assert(row[0].type() == Type::Int);
-    assert(row[1].type() == Type::Text);
-
-    // of course there is also iterator access
-    for (auto &row : ds) {
-      for (auto &field : row) {
-        std::cout << field << " ";
-      }
-      std::cout << std::endl;
-    }*/
 
   /**
    * REST server start
