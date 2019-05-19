@@ -14,7 +14,7 @@
 using namespace std::chrono;
 using namespace sl3;
 
-// define a db
+// instantiate a SQLite database
 Database db(":memory:");
 int      nextId = 1;
 
