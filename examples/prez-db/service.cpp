@@ -21,9 +21,6 @@ int      nextId = 1;
 std::string
 HTML_RESPONSE()
 {
-  const int color = rand();
-
-  // Generate some HTML
   std::stringstream stream;
 
   stream << "[";
