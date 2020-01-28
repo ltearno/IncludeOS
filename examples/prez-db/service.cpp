@@ -61,10 +61,8 @@ handle_request(const http::Request &req)
   if (req.method() == http::GET && req.uri().to_string() == "/api/posts") {
     res.add_body(HTML_RESPONSE());
 
-    header.set_field(http::header::Content_Type,
-                     "application/json; charset=UTF-8");
-    header.set_field(http::header::Content_Length,
-                     std::to_string(res.body().size()));
+    header.set_field(http::header::Content_Type, "application/json");
+    header.set_field(http::header::Content_Length, std::to_string(res.body().size()));
   } else {
     res.set_status_code(http::Not_Found);
   }
@@ -100,7 +98,7 @@ Service::start()
 
   auto &inet = net::Interfaces::get(0);
 
-  // Print some useful netstats every 30 secs
+  // Print netstats every 30 secs
   Timers::periodic(5s, 30s, [&inet](uint32_t) {
     printf("<Service> TCP STATUS:\n%s\n", inet.tcp().status().c_str());
   });
