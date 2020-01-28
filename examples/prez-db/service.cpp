@@ -25,8 +25,7 @@ HTML_RESPONSE()
 
   stream << "[";
 
-  Dataset ds = db.select(
-      "SELECT title, points, author, timeToRead, comments FROM posts;");
+  Dataset ds = db.select("SELECT title, points, author, timeToRead, comments FROM posts;");
   bool comma = false;
   for (auto &row : ds) {
     if (comma)
@@ -40,7 +39,7 @@ HTML_RESPONSE()
            << "     \"author\": \"" << row[2] << "\","
            << "     \"timeToRead\": " << row[3] << ","
            << "     \"comments\": " << row[4] << ""
-           << " }";
+           << "}";
   }
 
   stream << "]";
